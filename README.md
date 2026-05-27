@@ -1,0 +1,4 @@
+
+1. AVG() calculates the arithmetic mean of all values, while PERCENTILE_CONT(0.5) calculates the median value. Median is more honest for skewed data because it is less affected by extreme outliers. For example, a few very large orders can significantly increase the average, while the median still represents the typical order value more accurately.
+
+2. We needed window functions in Q5 because ORDER BY ... DESC LIMIT 20 can only return the top 20 customers, but it cannot generate rankings or compare each row with the previous one. Window functions such as RANK() and LAG() allow us to assign rankings and calculate the gap between customers without collapsing the result set.
