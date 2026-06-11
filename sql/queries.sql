@@ -59,3 +59,58 @@ JOIN shop.orders o
     ON c.customer_id = o.customer_id
 GROUP BY c.customer_id, c.email
 ORDER BY lifetime_spend DESC
+
+-- Q6 Customers with increasing monthly spending trend
+
+WITH monthly_customer_spend AS (
+
+    SELECT
+        customer_id,
+        date_trunc('month', order_date)::DATE AS month,
+        SUM(total) AS monthly_spend
+    FROM shop.orders
+    GROUP BY customer_id, month
+
+),
+
+spend_with_previous AS (
+
+    SELECT
+        customer_id,
+        month,
+        monthly_spend,
+
+        LAG(monthly_spend) OVER (
+            PARTITION BY customer_id
+            ORDER BY month
+        ) AS previous_month_spend
+
+    FROM monthly_customer_spend
+
+),
+
+growth_calculation AS (
+
+    SELECT
+        customer_id,
+        month,
+        monthly_spend,
+        previous_month_spend,
+
+        ROUND(
+            (
+                (monthly_spend - previous_month_spend)
+                / previous_month_spend
+            ) * 100,
+            2
+        ) AS growth_percentage
+
+    FROM spend_with_previous
+    WHERE previous_month_spend IS NOT NULL
+)
+
+SELECT *
+FROM growth_calculation
+WHERE growth_percentage > 20
+ORDER BY growth_percentage DESC
+LIMIT 20;
