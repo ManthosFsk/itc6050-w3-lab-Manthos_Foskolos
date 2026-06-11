@@ -86,3 +86,24 @@ This was the most advanced query in the lab. PostgreSQL's `RANK()` and `LAG()` w
 ### Summary
 
 For analytical workloads, PostgreSQL was generally more concise and faster on this dataset. The SQL queries were shorter, easier to read, and consistently executed faster than their MongoDB equivalents. MongoDB required longer aggregation pipelines, especially when joins, ranking, or window-style calculations were involved. However, MongoDB handled embedded documents naturally and provided flexible aggregation capabilities. I would choose SQL for reporting, analytics, and structured business data, MongoDB for document-oriented data models, and both together when an application needs transactional consistency as well as flexible document storage.
+
+
+## Concept Check
+
+### 1. Which query was hardest in MongoDB? Why?
+
+Q5 was the hardest query in MongoDB because it required window functions using `$setWindowFields`, `$rank`, and `$shift`. The logic was more complex than a standard aggregation pipeline, and the syntax was much more verbose compared to SQL window functions.
+
+### 2. Which query was hardest in SQL? Why?
+
+Q5 was also the hardest query in SQL because it involved multiple analytical concepts, including aggregation, ranking, and comparison with the previous row using `RANK()` and `LAG()`. Although SQL expressed the solution more concisely than MongoDB, it was still the most advanced query in the lab.
+
+### 3. Did the embedded `orders_embedded` collection make any query notably easier than working from referenced `orders`? Concrete example, please.
+
+Yes. Q2 (Top 10 products by revenue) was easier with `orders_embedded` because all order items were stored inside the order document. Using `$unwind` allowed the items to be processed directly without first joining separate collections. If the data had been fully referenced, additional lookups would have been required to access the order items.
+
+---
+
+## Stretch — The Polyglot Challenge
+
+In a real e-commerce application, I would store customer and product master data in PostgreSQL because these entities are highly structured and require strong consistency and relational integrity. I would also keep order events in PostgreSQL because orders are transactional records that must remain accurate and reliable. Clickstream and session logs would be stored in MongoDB because they are high-volume, semi-structured, and may change format over time. MongoDB's flexible document model is well suited for storing user activity and event data. Using both systems together allows each database to be used for the type of workload it handles best.
